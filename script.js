@@ -1,5 +1,6 @@
 const tg = window.Telegram.WebApp
+const tgDataEl = document.getElementById('tg-data')
 
 tg.ready()
 
-console.log(tg.initData)
+tgDataEl.innerHTML = tg.initData
