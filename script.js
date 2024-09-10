@@ -2,6 +2,7 @@ const tg = window.Telegram.WebApp
 const tgDataEl = document.getElementById('tg-data')
 const tgTokenEl = document.getElementById('tg-token')
 const responseBlockEl = document.getElementById('response')
+const paymentBtn = document.getElementById('payment-btn')
 
 tg.ready()
 
@@ -44,3 +45,7 @@ async function fetchData() {
     responseBlockEl.innerHTML = error
   }
 }
+
+paymentBtn.addEventListener('click', () => {
+  tg.openInvoice('')
+})
