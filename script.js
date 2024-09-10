@@ -65,6 +65,7 @@ async function getInvoice() {
   )
 
   const json = await response.json()
+  responseBlockEl.innerHTML = JSON.stringify(json)
   return json.link
 }
 
