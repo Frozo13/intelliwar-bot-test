@@ -9,3 +9,7 @@
   word-break: break-word;
   margin-bottom: 1rem;
 }
+
+button {
+  margin: 1rem 0;
+}

@@ -7,28 +7,30 @@ const paymentBtn = document.getElementById('payment-btn')
 tg.ready()
 
 let initData = tg.initData
+let accessToken
 
 if (tg.platform === 'unknown') {
   initData =
-    'query_id=AAHyMvYYAAAAAPIy9hiznDsx&user=%7B%22id%22%3A418788082%2C%22first_name%22%3A%22Arkadiy%22%2C%22last_name%22%3A%22Kovtun%22%2C%22username%22%3A%22Frozo13%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1720523658&hash=eb4dec65d4af57f2d04fcaf28616accaaa6a95246c188cd86a21958e4873854e'
+    'query_id=AAEV3w4qAgAAABXfDio79p6P&user=%7B%22id%22%3A5000584981%2C%22first_name%22%3A%22Perhapps%22%2C%22last_name%22%3A%22Test%22%2C%22username%22%3A%22perch%22%2C%22language_code%22%3A%22ru%22%2C%22allows_write_to_pm%22%3Atrue%7D&auth_date=1725975208&hash=e608e48b02e49a15f1af6758f265084a4718de796da3bea289b13efd6d8a6818'
 }
 
 tgDataEl.innerHTML = initData
 
-function base64encode(str) {
-  let encode = encodeURIComponent(str).replace(/%([a-f0-9]{2})/gi, (m, $1) =>
-    String.fromCharCode(parseInt($1, 16))
+function tgGetToken() {
+  let encode = encodeURIComponent(initData).replace(
+    /%([a-f0-9]{2})/gi,
+    (m, $1) => String.fromCharCode(parseInt($1, 16))
   )
   return btoa(encode)
 }
 
-const tgToken = base64encode(initData)
+const tgToken = tgGetToken()
 
 tgTokenEl.innerHTML = tgToken
 
-fetchData()
+// fetchData()
 
-async function fetchData() {
+async function login() {
   try {
     const response = await fetch(
       'https://api.intelliwar.com/api/v1/auth/login-by-tg',
@@ -39,13 +41,39 @@ async function fetchData() {
       }
     )
 
-    responseBlockEl.innerHTML = JSON.stringify(await response.json())
+    const json = await response.json()
+    accessToken = json.accessToken
+
+    responseBlockEl.innerHTML = JSON.stringify(json)
   } catch (error) {
     responseBlockEl.style.setProperty('color', 'red')
     responseBlockEl.innerHTML = error
   }
 }
 
-paymentBtn.addEventListener('click', () => {
-  tg.openInvoice('')
+async function getInvoice() {
+  const response = await fetch(
+    'https://api.intelliwar.com/api/v1/shop/get-tg-link',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({ purchaseId: '66c3852b22c5e3bbec4affbe' })
+    }
+  )
+
+  const json = await response.json()
+  return json.link
+}
+
+;(async () => {
+  await login()
+})()
+
+paymentBtn.addEventListener('click', async () => {
+  const link = await getInvoice()
+
+  tg.openInvoice(link)
 })
