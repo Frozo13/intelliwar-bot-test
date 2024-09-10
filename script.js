@@ -44,6 +44,7 @@ async function login() {
     const json = await response.json()
     accessToken = json.accessToken
 
+    responseBlockEl.style.setProperty('color', 'black')
     responseBlockEl.innerHTML = JSON.stringify(json)
   } catch (error) {
     responseBlockEl.style.setProperty('color', 'red')
@@ -52,21 +53,27 @@ async function login() {
 }
 
 async function getInvoice() {
-  const response = await fetch(
-    'https://api.intelliwar.com/api/v1/shop/get-tg-link',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`
-      },
-      body: JSON.stringify({ purchaseId: '66c3852b22c5e3bbec4affbe' })
-    }
-  )
+  try {
+    const response = await fetch(
+      'https://api.intelliwar.com/api/v1/shop/get-tg-link',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({ purchaseId: '66c3852b22c5e3bbec4affbe' })
+      }
+    )
 
-  const json = await response.json()
-  responseBlockEl.innerHTML = JSON.stringify(json)
-  return json.link
+    const json = await response.json()
+    responseBlockEl.style.setProperty('color', 'black')
+    responseBlockEl.innerHTML = JSON.stringify(json)
+    return json.link
+  } catch (error) {
+    responseBlockEl.style.setProperty('color', 'red')
+    responseBlockEl.innerHTML = error
+  }
 }
 
 ;(async () => {
@@ -76,5 +83,10 @@ async function getInvoice() {
 paymentBtn.addEventListener('click', async () => {
   const link = await getInvoice()
 
-  tg.openInvoice(link)
+  try {
+    tg.openInvoice(link)
+  } catch (error) {
+    responseBlockEl.style.setProperty('color', 'red')
+    responseBlockEl.innerHTML = error
+  }
 })
