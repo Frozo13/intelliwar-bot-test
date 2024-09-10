@@ -84,7 +84,10 @@ paymentBtn.addEventListener('click', async () => {
   const link = await getInvoice()
 
   try {
-    tg.openInvoice(link)
+    tg.openInvoice(link, (x) => {
+      responseBlockEl.style.setProperty('color', 'black')
+      responseBlockEl.innerHTML = JSON.stringify(x)
+    })
   } catch (error) {
     responseBlockEl.style.setProperty('color', 'red')
     responseBlockEl.innerHTML = error
